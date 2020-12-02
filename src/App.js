@@ -19,7 +19,7 @@ const App = () => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({username, password})
+      const user = await loginService.login( { username, password } )
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
 
       setUser(user)
@@ -27,8 +27,8 @@ const App = () => {
       setPassword('')
       setNotification('logged in successfully.')
       setNotificationType('success')
-      setTimeout(() => {setNotification('')}, 10000)      
-    } 
+      setTimeout(() => {setNotification('')}, 10000)
+    }
     catch(err) {
       setNotification('wrong username or password.')
       setNotificationType('error')
@@ -44,13 +44,13 @@ const App = () => {
       </div>
       <div>
         password: <input type="password" name="password" value={password} onChange={({ target }) => setPassword(target.value)} />
-      </div>    
+      </div>
       <div>
         <input type="submit" value="Submit" />
         <br /><br />
       </div>
     </form>
-  )  
+  )
 
 
 
@@ -62,7 +62,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const App = () => {
     if(user) {
       setUser(JSON.parse(user))
     }
-  }, [])  
+  }, [])
 
   return (
     <div>
@@ -78,7 +78,7 @@ const App = () => {
 
       <Notification message={notification} type={notificationType} />
 
-      { user === null ? loginForm() : 
+      { user === null ? loginForm() :
         <div>{user.name} logged in <button onClick={logout}>Logout</button>
           <br /><br />
           <Togglable buttonLabel='show form'>
