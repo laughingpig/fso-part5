@@ -36,6 +36,79 @@ const App = () => {
     }
   }
 
+  const addLike = async (blog) => {
+    const updatedBlog = {
+      _id: blog.id,
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      user: blog.user.id,
+      likes: blog.likes+1
+    }
+
+    try {
+      blogService.setToken(user.token)
+      await blogService.updateBlog(blog.id, updatedBlog)
+      blogService.getAll().then(blogs =>
+      {
+        setBlogs(blogs)
+      }
+      )
+      setNotification('added like.')
+      setNotificationType('success')
+      setTimeout(() => {setNotification('')}, 10000)
+    }
+    catch(err) {
+      setNotification('error adding like.')
+      setNotificationType('error')
+      setTimeout(() => {setNotification('')}, 10000)
+    }
+  }
+
+  const processBlogForm = async (event, title, author,url) => {
+    event.preventDefault()
+
+    try {
+      blogService.setToken(user.token)
+      await blogService.newBlog( { title, author, url } )
+      blogService.getAll().then(blogs =>
+      {
+        setBlogs(blogs)
+      }
+      )
+      setNotification('new blog added.')
+      setNotificationType('success')
+      setTimeout(() => {setNotification('')}, 10000)
+    }
+    catch(err) {
+      setNotification('error adding blog.')
+      setNotificationType('error')
+      setTimeout(() => {setNotification('')}, 10000)
+    }
+  }
+
+  const deleteBlog = async (event, blog) => {
+    if (window.confirm('Do you really want to delete'+blog.title+'?')) {
+      try {
+        blogService.setToken(user.token)
+        await blogService.deleteBlog(blog.id)
+        blogService.getAll().then(blogs =>
+        {
+          setBlogs(blogs)
+        }
+        )
+        setNotification('blog deleted.')
+        setNotificationType('success')
+        setTimeout(() => {setNotification('')}, 10000)
+      }
+      catch(err) {
+        setNotification('error deleting blog.')
+        setNotificationType('error')
+        setTimeout(() => {setNotification('')}, 10000)
+      }
+    }
+  }
+
   const loginForm = () => (
     <form onSubmit={processForm}>
       <h2>login to application</h2>
@@ -51,8 +124,6 @@ const App = () => {
       </div>
     </form>
   )
-
-
 
   const logout = () => {
     setUser(null)
@@ -82,13 +153,13 @@ const App = () => {
         <div>{user.name} logged in <button onClick={logout}>Logout</button>
           <br /><br />
           <Togglable buttonLabel='show form'>
-            <BlogForm user={user} setBlogs={setBlogs} setNotification={setNotification} setNotificationType={setNotificationType} />
+            <BlogForm processBlogForm={processBlogForm} />
           </Togglable>
         </div>
       }
 
       {blogs.map(blog =>
-        <Blog key={blog.id} user={user} blog={blog} setBlogs={setBlogs} setNotification={setNotification} setNotificationType={setNotificationType} />
+        <Blog key={blog.id} user={user} blog={blog} addLike={addLike} deleteBlog={deleteBlog} />
       )}
     </div>
   )

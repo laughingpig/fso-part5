@@ -1,45 +1,21 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
-import PropTypes from 'prop-types'
 
-const BlogForm = ( { user, setBlogs, setNotification, setNotificationType } ) => {
+const BlogForm = ( { processBlogForm } ) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const processBlogForm = async (event) => {
-    event.preventDefault()
-
-    try {
-      blogService.setToken(user.token)
-      await blogService.newBlog( { title, author, url } )
-      blogService.getAll().then(blogs =>
-      {
-        setBlogs(blogs)
-      }
-      )
-      setNotification('new blog added.')
-      setNotificationType('success')
-      setTimeout(() => {setNotification('')}, 10000)
-    }
-    catch(err) {
-      setNotification('error adding blog.')
-      setNotificationType('error')
-      setTimeout(() => {setNotification('')}, 10000)
-    }
-  }
-
   return (
-    <form onSubmit={processBlogForm}>
+    <form onSubmit={(event) => processBlogForm(event, title, author, url)}>
       <h2>create new</h2>
       <div>
-        title: <input value={title} name="title" type="text" onChange={({ target }) => setTitle(target.value)} />
+        title: <input value={title} name="title" type="text" onChange={({ target }) => setTitle(target.value)} className="title" />
       </div>
       <div>
-        author: <input type="text" name="author" value={author} onChange={({ target }) => setAuthor(target.value)} />
+        author: <input type="text" name="author" value={author} onChange={({ target }) => setAuthor(target.value)} className="author" />
       </div>
       <div>
-        url: <input type="text" name="url" value={url} onChange={({ target }) => setUrl(target.value)} />
+        url: <input type="text" name="url" value={url} onChange={({ target }) => setUrl(target.value)} className="url" />
       </div>
       <div>
         <input type="submit" value="Submit" />
@@ -47,13 +23,6 @@ const BlogForm = ( { user, setBlogs, setNotification, setNotificationType } ) =>
       </div>
     </form>
   )
-}
-
-BlogForm.propTypes = {
-  user: PropTypes.object.isRequired,
-  setBlogs: PropTypes.func.isRequired,
-  setNotification: PropTypes.func.isRequired,
-  setNotificationType: PropTypes.func.isRequired,
 }
 
 export default BlogForm
