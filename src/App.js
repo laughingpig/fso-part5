@@ -21,7 +21,7 @@ const App = () => {
     try {
       const user = await loginService.login( { username, password } )
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
-
+      console.log(user)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -47,6 +47,7 @@ const App = () => {
     }
 
     try {
+      console.log(user.token)
       blogService.setToken(user.token)
       await blogService.updateBlog(blog.id, updatedBlog)
       blogService.getAll().then(blogs =>
@@ -70,15 +71,13 @@ const App = () => {
 
     try {
       blogService.setToken(user.token)
-      await blogService.newBlog( { title, author, url } )
-      blogService.getAll().then(blogs =>
-      {
-        setBlogs(blogs)
-      }
-      )
-      setNotification('new blog added.')
-      setNotificationType('success')
-      setTimeout(() => {setNotification('')}, 10000)
+      blogService.newBlog( { title, author, url } ).then(returnedBlog => {
+        console.log(returnedBlog)
+        setBlogs(blogs.concat(returnedBlog))
+        setNotification('new blog added.')
+        setNotificationType('success')
+        setTimeout(() => {setNotification('')}, 10000)        
+      })
     }
     catch(err) {
       setNotification('error adding blog.')
@@ -113,10 +112,10 @@ const App = () => {
     <form onSubmit={processForm}>
       <h2>login to application</h2>
       <div>
-        username: <input value={username} name="username" type="text" onChange={({ target }) => setUsername(target.value)} />
+        username: <input value={username} name="username" id="username" type="text" onChange={({ target }) => setUsername(target.value)} />
       </div>
       <div>
-        password: <input type="password" name="password" value={password} onChange={({ target }) => setPassword(target.value)} />
+        password: <input type="password" name="password" id="password" value={password} onChange={({ target }) => setPassword(target.value)} />
       </div>
       <div>
         <input type="submit" value="Submit" />
@@ -150,7 +149,7 @@ const App = () => {
       <Notification message={notification} type={notificationType} />
 
       { user === null ? loginForm() :
-        <div>{user.name} logged in <button onClick={logout}>Logout</button>
+        <div>{user.username} logged in <button onClick={logout}>Logout</button>
           <br /><br />
           <Togglable buttonLabel='show form'>
             <BlogForm processBlogForm={processBlogForm} />
@@ -158,9 +157,11 @@ const App = () => {
         </div>
       }
 
+      <div id="bloglist">
       {blogs.map(blog =>
         <Blog key={blog.id} user={user} blog={blog} addLike={addLike} deleteBlog={deleteBlog} />
       )}
+      </div>
     </div>
   )
 }

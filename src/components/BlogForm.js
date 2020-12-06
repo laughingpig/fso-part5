@@ -18,7 +18,7 @@ const BlogForm = ( { processBlogForm } ) => {
         url: <input type="text" name="url" value={url} onChange={({ target }) => setUrl(target.value)} className="url" />
       </div>
       <div>
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Submit" id="blogform" />
         <br /><br />
       </div>
     </form>
